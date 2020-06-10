@@ -530,6 +530,9 @@ test_missing_c_flag(void)
 	/* check an invalid cpu value >= CPU_SETSIZE */
 	const char * const argv30[] = { prgname, prefix, mp_flag,
 				 "--lcores", "3@1024" };
+	/* check an invalid cpu value, num_cpus > x < CPU_SETSIZE */
+	const char * const argv31[] = { prgname, prefix, mp_flag,
+				 "--lcores", "3@1023" };
 
 	if (launch_proc(argv2) != 0) {
 		printf("Error - "
@@ -594,6 +597,17 @@ test_missing_c_flag(void)
 		printf("Error - "
 		       "process did not run ok with valid corelist value\n");
 		return -1;
+	}
+
+	if (launch_proc(argv31) == 0) {
+		/*
+		 * If we get to systems with 1024 cores, this test will fail.
+		 * At that point we probably need to start updating the
+		 * the code to work past 1024, so this will act as a reminder
+		 */
+		printf("Error - "
+		       "process ran without error with invalid --lcore flag\n");
+			return -1;
 	}
 
 	return 0;
